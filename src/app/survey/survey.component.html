@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>APF Profi</title>
+</head>
+<body class="mat-app-background">
+<!--<h1>APF Kategorisierung</h1>-->
+<div>
+  <mat-vertical-stepper [linear]="isLinear" #stepper>
+    <ng-template matStepperIcon="edit">
+      <!--<mat-icon>check</mat-icon>-->
+    </ng-template>
+    <ng-template matStepperIcon="done">
+      <!--<mat-icon>check</mat-icon>-->
+    </ng-template>
+    <mat-step [completed]="anzahlRechnungen.length > 0">
+      <ng-template matStepLabel>Anzahl Rechnungen</ng-template>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Anzahl Rechnungen</mat-card-title>
+          <mat-card-subtitle
+          >Wieviele Kreditoren-Rechnungen verarbeiten Sie jährlich?
+            Anzahl der Lieferanten-Rechnungen die über Ihre
+            Kreditorenbuchhaltung aktuell und geschätzt in den nächsten 5
+            Jahren durchschnittlich verarbeitet werden.
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-radio-group
+            class="radio-group"
+            required
+            [(ngModel)]="anzahlRechnungen"
+          >
+            <mat-radio-button
+              class="radio-button"
+              *ngFor="let choice of anzahlRechnungenAuswahl"
+              [value]="choice"
+            >
+              {{ choice }}
+            </mat-radio-button>
+          </mat-radio-group>
+          <mat-form-field class="full-width">
+              <textarea
+                name="anzahlRechnungenKommentar"
+                matInput
+                placeholder="Kommentar"
+                [(ngModel)]="anzahlRechnungenComment"
+              ></textarea>
+          </mat-form-field>
+          <div *ngIf="isDebug" class="selected-value">
+            Ausgewählte Anzahl Rechnungen: {{ anzahlRechnungen }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <div>
+        <button mat-button matStepperNext>{{ next }}</button>
+      </div>
+    </mat-step>
+
+    <mat-step [completed]="rechnungsTypen.length > 0">
+      <ng-template matStepLabel>Rechnungstypen</ng-template>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Rechnungstypen</mat-card-title>
+          <mat-card-subtitle
+          >Wieviele unterschiedliche Rechnungstypen verarbeiten Sie? z.B.
+            Gemeinkostenrechnungen, Rechnungen mit Bestellbezug (MM =
+            Material), Investitionsrechnungen, etc.
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-radio-group
+            class="radio-group"
+            required
+            [(ngModel)]="rechnungsTypen"
+          >
+            <mat-radio-button
+              class="radio-button"
+              *ngFor="let choice of rechnungsTypenAuswahl"
+              [value]="choice"
+            >
+              {{ choice }}
+            </mat-radio-button>
+          </mat-radio-group>
+          <mat-form-field class="full-width">
+              <textarea
+                name="rechnungsTypKommentar"
+                matInput
+                placeholder="Kommentar"
+                [(ngModel)]="rechnungsTypenComment"
+              ></textarea>
+          </mat-form-field>
+          <div *ngIf="isDebug" class="selected-value">
+            Rechnungstypen: {{ rechnungsTypen }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <div>
+        <button mat-button matStepperPrevious>{{ back }}</button>
+        <button mat-button matStepperNext>{{ next }}</button>
+      </div>
+    </mat-step>
+
+    <mat-step [completed]="true">
+      <ng-template matStepLabel>Rechnungen mit Bestellbezug</ng-template>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Anzahl Rechnungen mit Bestellbezug</mat-card-title>
+          <mat-card-subtitle
+          >Wieviele Rechnungen mit Bestellbezug in % zur Gesamtzahl der Rechnungen verarbeiten Sie? Unter einer Rechnung mit Bestellbezug verstehen wir
+            ein Rechnung, welche aufgrund einer Bestelllösung in Ihrem System aufgegeben wurde und dessen Daten
+            zum Abgleich im Rechnungseingangsworkflow verwendet werden können.
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-slider #slider
+            [(value)]="rechnungenMitBestellbezug"
+            thumbLabel
+            [displayWith]="formatLabel"
+            tickInterval="1"
+            min="0"
+            max="100">
+          </mat-slider>
+
+          <mat-form-field class="full-width">
+              <textarea
+                name="rechnungenMitBestellbezug"
+                matInput
+                placeholder="Kommentar"
+                [(ngModel)]="rechnungenMitBestellbezugComment"
+              ></textarea>
+          </mat-form-field>
+          <div *ngIf="isDebug" class="selected-value">
+            Anzahl Rechnungen mit Bestelllbezug: {{ rechnungenMitBestellbezug }} Länge: {{rechnungenMitBestellbezug.length}}
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <div>
+        <button mat-button matStepperPrevious>{{ back }}</button>
+        <button mat-button matStepperNext>{{ next }}</button>
+      </div>
+    </mat-step>
+
+    <mat-step [completed]="bestellLoesung.length > 0">
+      <ng-template matStepLabel>Bestelllösung</ng-template>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Bestelllösung</mat-card-title>
+          <mat-card-subtitle
+          >Haben Sie eine Bestelllösung im Einsatz?
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-radio-group
+            class="radio-group"
+            required
+            [(ngModel)]="bestellLoesung"
+          >
+            <mat-radio-button
+              class="radio-button"
+              *ngFor="let choice of bestellLoesungAuswahl"
+              [value]="choice"
+            >
+              {{ choice }}
+            </mat-radio-button>
+          </mat-radio-group>
+
+          <mat-form-field class="full-width">
+              <textarea
+                name="bestellLösungKommentar"
+                matInput
+                placeholder="Kommentar"
+                [(ngModel)]="bestellLoesungComment"
+              ></textarea>
+          </mat-form-field>
+          <div *ngIf="isDebug" class="selected-value">
+            Bestelllösung: {{ bestellLoesung }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <div>
+        <button mat-button matStepperPrevious>{{ back }}</button>
+        <button mat-button matStepperNext>{{ next }}</button>
+      </div>
+    </mat-step>
+
+    <mat-step [completed]="kontierungsLogik.length > 0">
+      <ng-template matStepLabel>Kontierungslogik</ng-template>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Kontierungslogik</mat-card-title>
+          <mat-card-subtitle
+          >Wie komplex schätzen Sie ihre Kontierungslogik ein? Kontierung
+            auf verschiedene Merkmale wie: Bestellnummer, Kostenstelle,
+            Kostenart, Sachkonto, Anlagenummer, Fallnummer, etc.
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-radio-group
+            class="radio-group"
+            required
+            [(ngModel)]="kontierungsLogik"
+          >
+            <mat-radio-button
+              class="radio-button"
+              *ngFor="let choice of kontierungsLogikAuswahl"
+              [value]="choice"
+            >
+              {{ choice }}
+            </mat-radio-button>
+          </mat-radio-group>
+          <mat-form-field class="full-width">
+              <textarea
+                name="kontierungsLogikKommentar"
+                matInput
+                placeholder="Kommentar"
+                [(ngModel)]="kontierungsLogikComment"
+              ></textarea>
+          </mat-form-field>
+          <div *ngIf="isDebug" class="selected-value">
+            Kontierungslogik: {{ kontierungsLogik }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <div>
+        <button mat-button matStepperPrevious>{{ back }}</button>
+        <button mat-button matStepperNext>{{ next }}</button>
+      </div>
+    </mat-step>
+
+    <mat-step [completed]="erpSystem.length > 0">
+      <ng-template matStepLabel>ERP System</ng-template>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>ERP System</mat-card-title>
+          <mat-card-subtitle
+          >Welches ERP System haben Sie in Ihrer Organisation im Einsatz?
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-form-field #ff>
+            <mat-select placeholder="Auswahl ERP System" [(ngModel)]="erpSystem">
+              <mat-option *ngFor="let choice of erpSystemAuswahl" [value]="choice">
+                {{choice}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="full-width">
+              <textarea
+                name="erpSystemKommentar"
+                matInput
+                placeholder="Kommentar"
+                [(ngModel)]="erpSystemComment"
+              ></textarea>
+          </mat-form-field>
+          <div *ngIf="isDebug" class="selected-value">
+            ERP System: {{ erpSystem }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <div>
+        <button mat-button matStepperPrevious>{{ back }}</button>
+        <button mat-button matStepperNext>{{ next }}</button>
+      </div>
+    </mat-step>
+
+    <mat-step [completed]="dmsSystem.length > 0">
+      <ng-template matStepLabel>ECM System (DMS, Archiv)</ng-template>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>ECM System (DMS, Archiv)</mat-card-title>
+          <mat-card-subtitle
+          >Welches ECM System (DMS, Archiv) haben Sie im Einsatz?
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-radio-group
+            class="radio-group"
+            required
+            [(ngModel)]="dmsSystem"
+          >
+            <mat-radio-button
+              class="radio-button"
+              *ngFor="let choice of dmsSystemAuswahl"
+              [value]="choice"
+            >
+              {{ choice }}
+            </mat-radio-button>
+          </mat-radio-group>
+          <mat-form-field class="full-width">
+              <textarea
+                name="dmsSystemKommentar"
+                matInput
+                placeholder="Kommentar"
+                [(ngModel)]="dmsSystemComment"
+              ></textarea>
+          </mat-form-field>
+          <div *ngIf="isDebug" class="selected-value">
+            ECM System (DMS, Archiv): {{ dmsSystem }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <div>
+        <button mat-button matStepperPrevious>{{ back }}</button>
+        <button mat-button matStepperNext>{{ next }}</button>
+      </div>
+    </mat-step>
+
+    <mat-step [completed]="scanning.length > 0">
+      <ng-template matStepLabel>Scanning und Data Capture</ng-template>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Scanning und Data Capture</mat-card-title>
+          <mat-card-subtitle
+          >Haben Sie bereits eine Scanning Lösung mit OCR Erkennung im Einsatz?
+            Bitte schreiben Sie im Kommentar, ob diese Lösung für die Rechnungserkennung eingesetzt werden kann.
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-radio-group
+            class="radio-group"
+            required
+            [(ngModel)]="scanning"
+          >
+            <mat-radio-button
+              class="radio-button"
+              *ngFor="let choice of scanningAuswahl"
+              [value]="choice"
+            >
+              {{ choice }}
+            </mat-radio-button>
+          </mat-radio-group>
+          <mat-form-field class="full-width">
+              <textarea
+                name="scanningKommentar"
+                matInput
+                placeholder="Kommentar"
+                [(ngModel)]="scanningComment"
+              ></textarea>
+          </mat-form-field>
+          <div *ngIf="isDebug" class="selected-value">
+            Scanning und Data Capture: {{ scanning }}
+          </div>
+        </mat-card-content>
+      </mat-card>
+      <div>
+        <button mat-button matStepperPrevious>{{ back }}</button>
+        <button mat-button matStepperNext>{{ next }}</button>
+      </div>
+    </mat-step>
+
+    <mat-step [completed]="true">
+      <ng-template matStepLabel>Zusammenfassung</ng-template>
+      <h1>Zusammenfassung</h1>
+      <div>Folgende Angaben haben Sie gemacht:</div>
+
+      <mat-divider></mat-divider>
+      <h3>Anzahl Rechnungen</h3>
+      <div>{{ anzahlRechnungen }}</div>
+      <div>{{ anzahlRechnungenComment }}</div>
+      <mat-divider></mat-divider>
+      <h3>Anzahl Rechnungen mit Bestellbezug</h3>
+      <div>{{ rechnungenMitBestellbezug }}</div>
+      <div>{{ rechnungenMitBestellbezugComment }}</div>
+      <mat-divider></mat-divider>
+      <h3>Bestelllösung</h3>
+      <div>{{ bestellLoesung }}</div>
+      <div>{{ bestellLoesungComment }}</div>
+      <mat-divider></mat-divider>
+      <h3>Rechnungstypen</h3>
+      <div>{{ rechnungsTypen }}</div>
+      <div>{{ rechnungsTypenComment }}</div>
+      <mat-divider></mat-divider>
+      <h3>Kontierungslogik</h3>
+      <div>{{ kontierungsLogik }}</div>
+      <div>{{ kontierungsLogikComment }}</div>
+      <mat-divider></mat-divider>
+      <h3>ERP System</h3>
+      <div>{{ erpSystem }}</div>
+      <div>{{ erpSystemComment }}</div>
+      <mat-divider></mat-divider>
+      <h3>ECM System (DMS, Archiv)</h3>
+      <div>{{ dmsSystem }}</div>
+      <div>{{ dmsSystemComment }}</div>
+      <mat-divider></mat-divider>
+      <h3>Scanning</h3>
+      <div>{{ scanning }}</div>
+      <div>{{ scanningComment }}</div>
+      <mat-divider></mat-divider>
+      <div>
+        <button mat-button matStepperPrevious>{{ back }}</button>
+        <button mat-button matStepperNext>{{ next }}</button>
+        <button mat-button (click)="resetFields()">{{ reset }}</button>
+      </div>
+    </mat-step>
+    <mat-step>
+      <ng-template matStepLabel>Daten übermitteln</ng-template>
+      <form name="details" class="form">
+        <mat-form-field class="full-width">
+          <input
+            name="name"
+            matInput
+            placeholder="Name / Vorname"
+            required
+            [(ngModel)]="name"
+          />
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <input
+            name="email"
+            matInput
+            placeholder="Email"
+            required
+            [(ngModel)]="email"
+          />
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <input
+            name="company"
+            matInput
+            placeholder="Firma"
+            required
+            [(ngModel)]="company"
+          />
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+              <textarea
+                name="comment"
+                matInput
+                placeholder="Kommentar"
+                [(ngModel)]="comment"
+              ></textarea>
+        </mat-form-field>
+
+        <button
+          [disabled]="!readyToSend() || isActive"
+          mat-button
+          mat-raised-button
+          color="primary"
+          (click)="sendEmail()"
+        >
+          Abschicken
+        </button>
+      </form>
+    </mat-step>
+  </mat-vertical-stepper>
+</div>
+
+<div *ngIf="isActive" class="loading-indicator">
+  <mat-progress-spinner mode="indeterminate" color="primary"></mat-progress-spinner>
+</div>
+
+</body>
+</html>
